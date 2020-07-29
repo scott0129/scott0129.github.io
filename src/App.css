@@ -1,20 +1,22 @@
 body {
-    background-color: #FFFFFB;
+    background-color: #fdf6e3;
 }
 
-nav {
-    background-color: #FFFBEE;
+.split-nav {
+    background-color: #eee8d5;
 }
 
-nav a {
-    color: #111111;
+.split-nav a {
+    color: #586e75;
+    border-bottom: 5px solid #586e75;
 }
-nav a:visited {
-    color: #111111;
+.split-nav a:visited {
+    color: #586e75;
 }
 
 .paper {
-    background-color: #FFFBEE;
+    background-color: #eee8d5;
+    color: #586e75;
 }
 
 #introduction {

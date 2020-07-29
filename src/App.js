@@ -1,8 +1,8 @@
 import React from 'react';
-import IndexCard from './components/IndexCard';
-import Projects from './components/Projects';
-import './App.css';
+import Home from './pages/Home';
+import Projects from './pages/Projects';
 import './paper.min.css';
+import './App.css';
 import {
   BrowserRouter as Router,
   Switch,
@@ -29,9 +29,9 @@ function App() {
           </button>
           <div class='collapsible-body'>
               <ul class='inline'>
+                  <li><Link to='/'>Home</Link></li>
                   <li><Link to='/projects'>Projects</Link></li>
-                  <li><Link to='/about'>About</Link></li>
-                  <li><a href='https://github.com/scott0129'>Github</a></li>
+                  <li><a href='https://github.com/scott0129'>GitHub</a></li>
               </ul>
           </div>
       </div>
@@ -41,9 +41,7 @@ function App() {
       <Projects/>
     </Route>
     <Route path='/'>
-      <div class='col'>
-        <IndexCard/>
-      </div>
+        <Home/>
     </Route>
   </Switch>
 </Router>
