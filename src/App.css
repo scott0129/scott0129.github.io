@@ -19,6 +19,11 @@ body {
     color: #586e75;
 }
 
+.paper-btn {
+    background-color: #eee8d5;
+    border-color: #282003;
+}
+
 #introduction {
     font-size: 2vw;    
 }

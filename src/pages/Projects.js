@@ -3,7 +3,7 @@ import Project from '../components/Project.js';
 
 export default function Projects() {
   return (
-<div class='col'>
+<div class='row' style={{justifycontent: 'space-between'}}>
   <Project
     title='Rick Rolling News' 
     subtitle='Revitalization of an age-old meme' 
