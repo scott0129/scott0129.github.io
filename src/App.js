@@ -1,5 +1,6 @@
 import React from 'react';
 import Home from './pages/Home';
+import Blog from './pages/Blog';
 import Projects from './pages/Projects';
 import './paper.min.css';
 import './App.css';
@@ -31,6 +32,7 @@ function App() {
               <ul class='inline'>
                   <li><Link to='/'>Home</Link></li>
                   <li><Link to='/projects'>Projects</Link></li>
+                  <li><Link to='/blog'>Blog</Link></li>
                   <li><a href='https://github.com/scott0129'>GitHub</a></li>
               </ul>
           </div>
@@ -39,6 +41,9 @@ function App() {
   <Switch>
     <Route path='/projects'>
       <Projects/>
+    </Route>
+    <Route path='/blog'>
+        <Blog/>
     </Route>
     <Route path='/'>
         <Home/>

@@ -6,7 +6,7 @@ export default function Home() {
 <div class='col'>
   <div class='paper container border-dashed border-thick'>
     <div class='row flex-spaces' id='introduction'>
-      <span class='col-8 col'>
+      <span class='md-8 col'>
         <div id='title-name'>
             <h1>
               Hello there!
@@ -14,8 +14,8 @@ export default function Home() {
         </div>
         <div id='self-intro'>
             <p>Oh boy, looks like you've found my website</p>
-            <p>I'm just a regular guy that likes cool things and stuff</p>
-            <p>Feel free to take a look around, and enjoy your stay my friend</p>
+            <p>I'm just a regular guy that likes cool things and such</p>
+            <p>Feel free to take a look around, and I hope you enjoy your stay friend</p>
         </div>
     </span>
     <span class='col-4 col'>
