@@ -1,5 +1,5 @@
 import React from 'react';
-import me from './me-small.jpg'
+import me from '../images/me-small.jpg'
 
 export default function Home() {
   return (
