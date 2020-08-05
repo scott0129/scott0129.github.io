@@ -30,9 +30,9 @@ export default function Projects() {
       */}
       <Project
         title='Blockss' 
-        subtitle='Towering Jenga structures!' 
-        detail='A project that started as a small hackathon project, it&apos;s a tool for creating jenga towers!
-                You can build a tower with friends, and watch it fall down under the simulated physics!'
+        subtitle='Jenga but like, free spirited' 
+        detail='My friend loves to create Jenga towers, and suggested that we make this Block Stacking Simulator for a hackathon! 
+                The result of our two-day endeavor was a web toy with a simple but charming joy to it.'
         linkAddress='https://blockss.herokuapp.com/'
         image={blockss}
       />
