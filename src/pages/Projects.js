@@ -9,7 +9,10 @@ export default function Projects() {
   return (
 <div class='row margin-top-large'>
   <div class='paper container border-dashed border-thick'>
-    <h2 class='margin-none'>Some stuff I made</h2>
+    <div class='text-center'>
+      <h1 class='margin-none'>Projects</h1>
+      <h3 class='margin-top-none'>Many of these really isn't super useful</h3>
+    </div>
     <div class='row child-borders' style={{justifycontent: 'space-between'}}>
       <Project
         title='Rick Rolling News' 
