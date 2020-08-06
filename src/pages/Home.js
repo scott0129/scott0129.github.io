@@ -3,13 +3,13 @@ import me from '../images/me-small.jpg'
 
 export default function Home() {
   return (
-<div class='col'>
+<div class='row margin-top-large'>
   <div class='paper container border-dashed border-thick'>
     <div class='row flex-spaces' id='introduction'>
       <span class='md-8 col'>
         <div id='title-name'>
             <h1>
-              Hello there!
+              Hello!
             </h1>
         </div>
         <div id='self-intro'>

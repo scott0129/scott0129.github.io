@@ -2,7 +2,7 @@ import React from 'react';
 import { useContentful } from 'react-contentful';
 
 
-export default function Photos() {
+export default function Gallery() {
   const { data, error, fetched, loading } = useContentful({
     contentType: 'Page',
     query: {

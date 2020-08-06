@@ -2,7 +2,7 @@ import React from 'react';
 import { ContentfulClient, ContentfulProvider } from 'react-contentful';
 import Home from './pages/Home';
 import Blog from './pages/Blog';
-import Photos from './pages/Photos';
+import Gallery from './pages/Gallery';
 import Projects from './pages/Projects';
 import './paper.min.css';
 import './App.css';
@@ -53,21 +53,21 @@ function App() {
             </div>
         </div>
     </nav>
-    <Switch>
-      <Route path='/projects'>
-        <Projects/>
-      </Route>
-      <Route path='/photos'>
-          <Photos/>
-      </Route>
-      <Route path='/blog'>
-          <Blog/>
-      </Route>
-      <Route path='/'>
-          <Home/>
-      </Route>
-    </Switch>
-  </Router>
+      <Switch>
+        <Route path='/projects'>
+          <Projects/>
+        </Route>
+        <Route path='/photos'>
+            <Gallery/>
+        </Route>
+        <Route path='/blog'>
+            <Blog/>
+        </Route>
+        <Route path='/'>
+            <Home/>
+        </Route>
+      </Switch>
+    </Router>
 </ContentfulProvider>
 );
 }

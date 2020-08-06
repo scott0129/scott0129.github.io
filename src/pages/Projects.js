@@ -7,9 +7,9 @@ import scottkim from '../images/scottkim.png'
 
 export default function Projects() {
   return (
-<div class='col'>
+<div class='row margin-top-large'>
   <div class='paper container border-dashed border-thick'>
-    <h1 class='margin-none'>Some stuff I made</h1>
+    <h2 class='margin-none'>Some stuff I made</h2>
     <div class='row child-borders' style={{justifycontent: 'space-between'}}>
       <Project
         title='Rick Rolling News' 
