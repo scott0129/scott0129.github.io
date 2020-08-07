@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Blog from './pages/Blog';
 import Gallery from './pages/Gallery';
 import Projects from './pages/Projects';
+import PageNotFound from './pages/PageNotFound'
 import './paper.min.css';
 import './App.css';
 import {
@@ -44,9 +45,7 @@ function App() {
                 <ul class='inline'>
                     <li><Link to='/'>Home</Link></li>
                     <li><Link to='/projects'>Projects</Link></li>
-                    {/*
-                    <li><Link to='/photos'>Photos</Link></li>
-                    */}
+                    {/* <li><Link to='/photos'>Photos</Link></li> */}
                     <li><Link to='/blog'>Blog</Link></li>
                     <li><a href='https://github.com/scott0129'>GitHub</a></li>
                 </ul>
@@ -54,18 +53,11 @@ function App() {
         </div>
     </nav>
       <Switch>
-        <Route path='/projects'>
-          <Projects/>
-        </Route>
-        <Route path='/photos'>
-            <Gallery/>
-        </Route>
-        <Route path='/blog'>
-            <Blog/>
-        </Route>
-        <Route path='/'>
-            <Home/>
-        </Route>
+        <Route exact path='/' component={Home}/>
+        <Route path='/projects' component={Projects}/>
+        <Route path='/photos' component={Gallery}/>
+        <Route path='/blog' component={Blog}/>
+        <Route path='*' component={PageNotFound}/>
       </Switch>
     </Router>
 </ContentfulProvider>
