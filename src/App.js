@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Blog from './pages/Blog';
 import Gallery from './pages/Gallery';
 import Projects from './pages/Projects';
+import Todo from './pages/Todo';
 import PageNotFound from './pages/PageNotFound'
 import './paper.min.css';
 import './App.css';
@@ -47,6 +48,7 @@ function App() {
                     <li><Link to='/projects'>Projects</Link></li>
                     {/* <li><Link to='/photos'>Photos</Link></li> */}
                     <li><Link to='/blog'>Blog</Link></li>
+                    <li><Link to='/todo'>To-Do</Link></li>
                     <li><a href='https://github.com/scott0129'>GitHub</a></li>
                 </ul>
             </div>
@@ -57,6 +59,7 @@ function App() {
         <Route path='/projects' component={Projects}/>
         <Route path='/photos' component={Gallery}/>
         <Route path='/blog' component={Blog}/>
+        <Route path='/todo' component={Todo}/>
         <Route path='*' component={PageNotFound}/>
       </Switch>
     </Router>
