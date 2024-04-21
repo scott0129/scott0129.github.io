@@ -12,6 +12,10 @@ exports.helloworld = onCall((request) => {
 });
 
 exports.authenticateuser = onCall(async ({data}) => {
+  /**
+   * Gets the "groupChatName" and "firstName" of the user to see if it matches any existing entry.
+   * If so, return an authenticated token.
+   */
   let groupChatName: string = data.groupChatName;
   let firstName: string = data.firstName;
 

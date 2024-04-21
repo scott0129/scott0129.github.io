@@ -2,6 +2,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import app from './firebaseConfig'
 import { useState } from 'react';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
 
 const functions = getFunctions(app);
 const auth = getAuth(app);
@@ -9,6 +10,7 @@ const auth = getAuth(app);
 const LoginComponent = () => {
   const [groupChatName, setGroupChatName] = useState('');
   const [firstName, setFirstName] = useState('');
+  const [errorMessage, setErrorMessage] = useState('')
 
   const authenticate = async () => {
 
@@ -18,12 +20,19 @@ const LoginComponent = () => {
       const result: any = await authenticateUser({groupChatName, firstName});
       const token = result.data.token;
       await signInWithCustomToken(auth, token);
+      console.log("Sign-in successful!");
     } catch (e) {
-      console.error(e)
+      if (e instanceof FirebaseError && e.code == 'functions/failed-precondition') {
+        setErrorMessage('Couldn\'t log you in. Are you sure you typed in the group chat correctly? (no emojis)');
+      } else {
+        setErrorMessage('Unknown error. Contact Scotto');
+        console.error(e);
+      }
     }
 
+    const user = auth.currentUser;
+    console.log('User is logged in:', user);
   }
-
 
   return (
     <div>
@@ -38,7 +47,13 @@ const LoginComponent = () => {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
       />
-      <button onClick={(authenticate)}><h4>Press Me</h4></button>
+      <br/>
+      <button onClick={(authenticate)}>Press Me</button>
+    {errorMessage && (
+      <div style={{ color: 'red', border: '1px solid red', padding: '10px', marginTop: '10px' }}>
+        {errorMessage}
+      </div>
+    )}
     </div>
   );
 };
