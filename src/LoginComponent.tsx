@@ -1,5 +1,5 @@
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from 'firebase/functions';
-import app from './firebaseConfig'
+import app from './FirebaseApp'
 import { useState } from 'react';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
@@ -40,14 +40,14 @@ const LoginComponent = () => {
   }
 
   return (
-    <div>
-      <label>First Name </label>
-      <input type="text" id="firstName" 
+    <div className='card-body form-group'>
+      <label htmlFor='firstName'>First Name </label>
+      <input type="text" id='firstName' 
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
       />
       <br/>
-      <label>Group Chat Name </label>
+      <label htmlFor='groupChatName'>Group Chat Name </label>
       <input type="text" id="groupChatName" 
               value={groupChatName}
               onChange={(e) => setGroupChatName(e.target.value)}

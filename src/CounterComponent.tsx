@@ -7,7 +7,7 @@ import {
   increment,
   getFirestore,
 } from "firebase/firestore";
-import app from './firebaseConfig'
+import app from './FirebaseApp'
 
 const db = getFirestore(app); // Initialize Firestore
 
