@@ -27,18 +27,13 @@ function Home() {
   return (
     <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <img src="https://www.svgrepo.com/show/396385/face-exhaling.svg" className="logo" alt="Vite logo" />
       </div>
-      <h1>Vite + React</h1>
+      <h1>Whose Cough?</h1>
       {user == null ? <LoginComponent onLoginSuccess={() => { navigate('/profile'); }}/> : <LoggedInUI/>}
 
       <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+        Mom get the camera I have a website!
       </p>
     </>
   )

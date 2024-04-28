@@ -3,6 +3,7 @@ import app from '../FirebaseApp'
 import { FC, useState } from 'react';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
+import './style.css'
 
 const functions = getFunctions(app);
 if (window.location.hostname === "localhost") {
@@ -48,26 +49,31 @@ const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
   }
 
   return (
+    <>
+    <h3>To log in, give me your first name and the group chat this was posted in.</h3>
     <div className='card-body form-group'>
-      <label htmlFor='firstName'>First Name </label>
-      <input type="text" id='firstName' 
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-      />
-      <br/>
-      <label htmlFor='groupChatName'>Group Chat Name </label>
-      <input type="text" id="groupChatName" 
-              value={groupChatName}
-              onChange={(e) => setGroupChatName(e.target.value)}
-      />
-      <br/>
-      <button onClick={(authenticate)}>Press Me</button>
-    {errorMessage && (
-      <div style={{ color: 'red', border: '1px solid red', padding: '10px', marginTop: '10px' }}>
-        {errorMessage}
+      <div className='label-input-container'>
+        <label htmlFor='firstName'>First Name </label>
+        <input type="text" id='firstName' 
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+        />
       </div>
-    )}
+      <div className='label-input-container'>
+        <label htmlFor='groupChatName'>Group Chat Name </label>
+        <input type="text" id="groupChatName" 
+                value={groupChatName}
+                onChange={(e) => setGroupChatName(e.target.value)}
+        />
+      </div>
+      <button onClick={(authenticate)}>Press Me</button>
+      {errorMessage && (
+        <div style={{ color: 'red', border: '1px solid red', padding: '10px', marginTop: '10px' }}>
+          {errorMessage}
+        </div>
+      )}
     </div>
+    </>
   );
 };
 
