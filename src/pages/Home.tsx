@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
+import reactLogo from '../assets/react.svg'
 import viteLogo from '/vite.svg'
-import './App.css'
-import app from './FirebaseApp';
-import CounterComponent from './CounterComponent'; // Import the counter component
-import LoginComponent from './LoginComponent';
+import app from '../FirebaseApp';
+import CounterComponent from '../CounterComponent'; // Import the counter component
 import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
+import LoginComponent from '../login/LoginComponent';
+import { useNavigate } from 'react-router-dom';
 
 const auth = getAuth(app);
 
-
-function App() {
+function Home() {
   const [user, setUser] = useState<User | null>(null)
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Listen for changes to the user's authentication state
@@ -35,7 +35,7 @@ function App() {
         </a>
       </div>
       <h1>Vite + React</h1>
-      {user == null ? <LoginComponent/> : <LoggedInUI/>}
+      {user == null ? <LoginComponent onLoginSuccess={() => { navigate('/profile'); }}/> : <LoggedInUI/>}
 
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
@@ -60,4 +60,4 @@ function LoggedInUI() {
   );
 }
 
-export default App
+export default Home

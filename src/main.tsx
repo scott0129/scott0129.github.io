@@ -1,15 +1,21 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
+import Home from './pages/Home.tsx'
 import './index.css'
+import './assets/App.css'
 // import './assets/paper.min.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import Profile from './pages/Profile.tsx'
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <App/>,
+    path: '/',
+    element: <Home/>,
   },
+  {
+    path: '/profile',
+    element: <Profile/>
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

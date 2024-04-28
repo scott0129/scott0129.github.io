@@ -1,6 +1,6 @@
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from 'firebase/functions';
-import app from './FirebaseApp'
-import { useState } from 'react';
+import app from '../FirebaseApp'
+import { FC, useState } from 'react';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 
@@ -11,7 +11,11 @@ if (window.location.hostname === "localhost") {
 }
 const auth = getAuth(app);
 
-const LoginComponent = () => {
+interface LoginComponentProps {
+  onLoginSuccess?: () => void; // Callback prop for successful login
+}
+
+const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
   const [groupChatName, setGroupChatName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [errorMessage, setErrorMessage] = useState('')
@@ -26,6 +30,10 @@ const LoginComponent = () => {
       const token = result.data.token;
       await signInWithCustomToken(auth, token);
       console.log("Sign-in successful!");
+      if (onLoginSuccess) {
+        console.log('callback');
+        onLoginSuccess(); // Invoke the callback on successful login
+      }
     } catch (e) {
       if (e instanceof FirebaseError && e.code == 'functions/failed-precondition') {
         setErrorMessage('Couldn\'t log you in. Are you sure you typed in the group chat correctly?');
