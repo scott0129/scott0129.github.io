@@ -1,0 +1,18 @@
+.example-card {
+  margin: 1em;
+}
+
+.trash-can {
+  margin: 0.25em;
+
+  img {
+    width: 1.5em;
+  }
+}
+
+
+@media (prefers-color-scheme: dark) {
+  .trash-can img {
+    filter: invert(1);
+  }
+}

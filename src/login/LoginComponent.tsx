@@ -50,7 +50,6 @@ const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
 
   return (
     <>
-    <h3>To log in, give me your first name and the group chat this was posted in.</h3>
     <div className='card-body form-group'>
       <div className='label-input-container'>
         <label htmlFor='firstName'>First Name </label>
@@ -66,7 +65,7 @@ const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
                 onChange={(e) => setGroupChatName(e.target.value)}
         />
       </div>
-      <button onClick={(authenticate)}>Press Me</button>
+      <button onClick={(authenticate)}>Log In</button>
       {errorMessage && (
         <div style={{ color: 'red', border: '1px solid red', padding: '10px', marginTop: '10px' }}>
           {errorMessage}

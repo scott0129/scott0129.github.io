@@ -30,6 +30,8 @@ function Home() {
         <img src="https://www.svgrepo.com/show/396385/face-exhaling.svg" className="logo" alt="Vite logo" />
       </div>
       <h1>Whose Cough?</h1>
+      <h4>To log in, give me your first name and the group chat this was posted in.</h4>
+      <p>(Leave blank if this was a DM)</p>
       {user == null ? <LoginComponent onLoginSuccess={() => { navigate('/profile'); }}/> : <LoggedInUI/>}
 
       <p className="read-the-docs">

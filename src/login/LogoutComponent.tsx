@@ -7,7 +7,7 @@ function LogoutComponent() {
 
   return (
     <>
-      <button onClick={() => {
+      <button style={{margin: '1em'}} onClick={() => {
         getAuth(app).signOut().then(() => {
           console.log("User signed out successfully");
           navigate('/');
