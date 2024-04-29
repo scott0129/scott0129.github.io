@@ -6,22 +6,21 @@ import CounterComponent from '../CounterComponent'; // Import the counter compon
 import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
 import LoginComponent from '../login/LoginComponent';
 import { useNavigate } from 'react-router-dom';
+import LogoutComponent from '../login/LogoutComponent';
 
 const auth = getAuth(app);
 
 function Home() {
-  const [user, setUser] = useState<User | null>(null)
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Listen for changes to the user's authentication state
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (newUser) => {
+      setUser(newUser);
     });
 
-    // Clean up the subscription on unmount
     return () => unsubscribe();
-  }, [])
+  }, []);
 
 
   return (
@@ -29,14 +28,31 @@ function Home() {
       <div>
         <img src="https://www.svgrepo.com/show/396385/face-exhaling.svg" className="logo" alt="Vite logo" />
       </div>
-      <h1>Whose Cough?</h1>
-      <h4>To log in, give me your first name and the group chat this was posted in.</h4>
-      <p>(Leave blank if this was a DM)</p>
-      {user == null ? <LoginComponent onLoginSuccess={() => { navigate('/profile'); }}/> : <LoggedInUI/>}
 
-      <p className="read-the-docs">
-        Mom get the camera I have a website!
-      </p>
+      <h1>Whose Cough?</h1>
+
+
+      { user ? 
+      <>
+        <h3>Welcome Back {user.displayName}!</h3>
+        <button onClick={() => { navigate('/profile') }}>Go to upload page</button>
+        <LogoutComponent/>
+        <CounterComponent/>
+        <p className="read-the-docs">
+          ^ That's kind of a fun counter, everyone on this website sees the same count.
+        </p>
+      </>
+      :
+      <>
+        <h4>To log in, give me your first name and the group chat this was posted in.</h4>
+        <p>(Leave blank if this was a DM)</p>
+        <LoginComponent onLoginSuccess={() => { navigate('profile') }}/>
+        <p className="read-the-docs">
+          Look ma, a website
+        </p>
+      </>
+      }
+
     </>
   )
 }
@@ -44,15 +60,6 @@ function Home() {
 function LoggedInUI() {
   return (
     <>
-      <h1>Welcome Back!</h1>
-      <button onClick={() => {
-        getAuth(app).signOut().then(() => {
-          console.log("User signed out successfully");
-        }).catch((error) => {
-          console.error("Error signing out: ", error);
-        });
-      }}>Sign Out</button>
-      <CounterComponent />
     </>
   );
 }

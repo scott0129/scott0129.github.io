@@ -1,7 +1,7 @@
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from 'firebase/functions';
 import app from '../FirebaseApp'
-import { FC, useState } from 'react';
-import { getAuth, signInWithCustomToken } from 'firebase/auth';
+import { FC, useEffect, useState } from 'react';
+import { getAuth, onAuthStateChanged, signInWithCustomToken, updateProfile } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import './style.css'
 
@@ -21,6 +21,20 @@ const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
   const [firstName, setFirstName] = useState('');
   const [errorMessage, setErrorMessage] = useState('')
 
+  // useEffect(() => {
+  //   // Listen for changes to the user's authentication state
+  //   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+  //     setUser(currentUser);
+  //   });
+
+  //   // Clean up the subscription on unmount
+  //   return () => unsubscribe();
+  // }, [])
+
+  const capitalize = (name: string) => {
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+  }
+
   const authenticate = async () => {
 
     const authenticateUser = httpsCallable(functions, 'authenticateuser')
@@ -29,10 +43,11 @@ const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
       setErrorMessage('');
       const result: any = await authenticateUser({groupChatName, firstName});
       const token = result.data.token;
-      await signInWithCustomToken(auth, token);
+      await signInWithCustomToken(auth, token).then(async (credentials) => {
+        await updateProfile(credentials.user, {displayName: capitalize(firstName)});
+      });
       console.log("Sign-in successful!");
       if (onLoginSuccess) {
-        console.log('callback');
         onLoginSuccess(); // Invoke the callback on successful login
       }
     } catch (e) {
