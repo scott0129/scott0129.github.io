@@ -6,6 +6,7 @@ import { AudioRecorder } from 'react-audio-voice-recorder';
 import LogoutComponent from '../login/LogoutComponent';
 import trashCan from '/trash-can.svg'
 import './profile.css'
+import { useNavigate } from 'react-router-dom';
 
 
 const auth = getAuth(app);
@@ -23,6 +24,8 @@ class CoughFile {
 
 
 function Profile() {
+  const navigate = useNavigate();
+
   const [uid, setUid] = useState<string | null>(null);
   const [coughUploads, setCoughUploads] = useState<CoughFile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +42,7 @@ function Profile() {
         setUid(user.uid);
       } else {
         setUid(null);
+        navigate('/')
       }
     });
 
