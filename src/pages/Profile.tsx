@@ -141,7 +141,7 @@ function Profile() {
       <h1>Cough Time</h1>
 
       { !(goodCoughURL && badCoughURL) ? <p>Loading examples...</p> :
-      <span style={{ display: 'flex', flexDirection: 'row', overflow: 'scroll', boxShadow: '3px 3px 3px black', border: '1px solid silver'}}>
+      <div style={{ display: 'flex', flexDirection: 'row', overflow: 'scroll', boxShadow: '3px 3px 3px black', border: '1px solid silver'}}>
         <div className='example-card'>
           <h4>Good cough example:</h4>
           <p>Not a lot of vocalization, not a lot of silence.</p>
@@ -154,7 +154,7 @@ function Profile() {
           <p>Too much vocalization, sorta immediately obvious who it is.</p>
           <audio src={badCoughURL!} controls={true}></audio>
         </div>
-      </span>
+      </div>
       }
 
       <h3>Record and upload your cough: </h3>
@@ -179,10 +179,10 @@ function Profile() {
       : 
       <>
         <audio src={audioBlobUrl} controls={true} />
-        <span>
+        <div>
           <button style={{ margin: '0.5em' }} onClick={() => { uploadCough() }}>Upload</button>
           <button style={{ margin: '0.5em' }} onClick={() => { setAudioBlob(null); setAudioBlobUrl(null); }}>Record Again</button>
-        </span>
+        </div>
       </>
       }
 
