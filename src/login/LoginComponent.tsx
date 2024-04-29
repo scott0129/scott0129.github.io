@@ -1,7 +1,7 @@
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from 'firebase/functions';
 import app from '../FirebaseApp'
-import { FC, useEffect, useState } from 'react';
-import { getAuth, onAuthStateChanged, signInWithCustomToken, updateProfile } from 'firebase/auth';
+import { FC, useState } from 'react';
+import { getAuth, signInWithCustomToken, updateProfile } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import './style.css'
 

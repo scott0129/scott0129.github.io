@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import reactLogo from '../assets/react.svg'
-import viteLogo from '/vite.svg'
+// import reactLogo from '../assets/react.svg'
+// import viteLogo from '/vite.svg'
 import app from '../FirebaseApp';
 import CounterComponent from '../CounterComponent'; // Import the counter component
 import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -55,13 +55,6 @@ function Home() {
 
     </>
   )
-}
-
-function LoggedInUI() {
-  return (
-    <>
-    </>
-  );
 }
 
 export default Home
