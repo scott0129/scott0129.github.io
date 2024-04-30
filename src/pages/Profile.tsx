@@ -162,6 +162,7 @@ function Profile() {
       }
 
       <h3>Record and upload your cough: </h3>
+      <p>Feel free to upload as many coughs. It'll help the science!</p>
       { !audioBlobUrl ?  
       <>
       <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
