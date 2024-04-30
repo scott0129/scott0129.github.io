@@ -20,6 +20,7 @@ const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
   const [groupChatName, setGroupChatName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [errorMessage, setErrorMessage] = useState('')
+  const [authenticating, setAuthenticating] = useState(false);
 
   // useEffect(() => {
   //   // Listen for changes to the user's authentication state
@@ -31,12 +32,18 @@ const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
   //   return () => unsubscribe();
   // }, [])
 
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    await authenticate();
+  }
+
   const capitalize = (name: string) => {
     return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
   }
 
   const authenticate = async () => {
 
+    setAuthenticating(true);
     const authenticateUser = httpsCallable(functions, 'authenticateuser')
 
     try {
@@ -57,6 +64,8 @@ const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
         setErrorMessage('Unknown error. Contact Scotto');
         console.error(e);
       }
+    } finally {
+      setAuthenticating(false);
     }
 
     const user = auth.currentUser;
@@ -65,28 +74,28 @@ const LoginComponent: FC<LoginComponentProps> = ({ onLoginSuccess }) => {
 
   return (
     <>
-    <div className='card-body form-group'>
+    <form onSubmit={submit} className='card-body form-group'>
       <div className='label-input-container'>
         <label htmlFor='firstName'>First Name </label>
         <input type="text" id='firstName' 
-                value={firstName}
+                disabled={authenticating} value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
         />
       </div>
       <div className='label-input-container'>
         <label htmlFor='groupChatName'>Group Chat Name </label>
         <input type="text" id="groupChatName" 
-                value={groupChatName}
+                disabled={authenticating} value={groupChatName}
                 onChange={(e) => setGroupChatName(e.target.value)}
         />
       </div>
-      <button onClick={(authenticate)}>Log In</button>
+      <button disabled={authenticating} type='submit'>Log In</button>
       {errorMessage && (
         <div style={{ color: 'red', border: '1px solid red', padding: '10px', marginTop: '10px' }}>
           {errorMessage}
         </div>
       )}
-    </div>
+    </form>
     </>
   );
 };
