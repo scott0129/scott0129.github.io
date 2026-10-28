@@ -16,7 +16,7 @@ interface PlayedMove {
 // Patricia's Skill_Level 1-20 and their Elo (from her README); 21 is full strength.
 const LEVEL_ELO = [500, 800, 1000, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2650, 2800, 3000];
 const FULL_STRENGTH = 21;
-const DEFAULT_LEVEL = 7;
+const DEFAULT_LEVEL = FULL_STRENGTH;
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const MIN_THINK_MS = 700; // so low levels don't answer instantly
 const ANALYSIS_MS = 900; // full-strength look at the position while it's your move
