@@ -42,7 +42,7 @@ function Profile() {
         setUid(user.uid);
       } else {
         setUid(null);
-        navigate('/')
+        navigate('/cougher')
       }
     });
 

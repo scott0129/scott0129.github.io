@@ -35,7 +35,7 @@ function Home() {
       { user ? 
       <>
         <h3>Welcome Back {user.displayName}!</h3>
-        <button onClick={() => { navigate('/profile') }}>Go to upload page</button>
+        <button onClick={() => { navigate('/cougher/profile') }}>Go to upload page</button>
         <LogoutComponent/>
         <CounterComponent/>
         <p className="read-the-docs">
@@ -46,7 +46,7 @@ function Home() {
       <>
         <h4>To log in, give me your first name and the group chat this was posted in.</h4>
         <p>(Leave blank if this was a DM)</p>
-        <LoginComponent onLoginSuccess={() => { navigate('profile') }}/>
+        <LoginComponent onLoginSuccess={() => { navigate('/cougher/profile') }}/>
         <p className="read-the-docs">
           Look ma, a website
         </p>
