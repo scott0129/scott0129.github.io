@@ -98,12 +98,40 @@ function findKing(g: Chess, color: Side): Square | null {
   return null;
 }
 
+const SAVE_KEY = 'chess.game.v1';
+
+interface SavedGame {
+  level: number;
+  side: Side;
+  orientation: 'white' | 'black';
+  moves: PlayedMove[];
+}
+
+/** The game in progress (and chosen strength), so a refresh doesn't lose it. */
+function loadSaved(): SavedGame | null {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw) as SavedGame;
+    if (!Number.isInteger(s.level) || s.level < 1 || s.level > FULL_STRENGTH) return null;
+    if (s.side !== 'w' && s.side !== 'b') return null;
+    if (s.orientation !== 'white' && s.orientation !== 'black') return null;
+    if (!Array.isArray(s.moves)) return null;
+    const moves: PlayedMove[] = s.moves.map((m) => ({ from: m.from, to: m.to, promotion: m.promotion }));
+    replay(moves); // throws if any saved move is illegal, which discards the save
+    return { level: s.level, side: s.side, orientation: s.orientation, moves };
+  } catch {
+    return null;
+  }
+}
+
 export default function ChessPage() {
   const engine = usePatricia();
-  const [moves, setMoves] = useState<PlayedMove[]>([]);
-  const [playerSide, setPlayerSide] = useState<Side>('w');
-  const [orientation, setOrientation] = useState<'white' | 'black'>('white');
-  const [level, setLevel] = useState(DEFAULT_LEVEL);
+  const [saved] = useState(loadSaved);
+  const [moves, setMoves] = useState<PlayedMove[]>(saved?.moves ?? []);
+  const [playerSide, setPlayerSide] = useState<Side>(saved?.side ?? 'w');
+  const [orientation, setOrientation] = useState<'white' | 'black'>(saved?.orientation ?? 'white');
+  const [level, setLevel] = useState(saved?.level ?? DEFAULT_LEVEL);
   const [thinking, setThinking] = useState(false);
   const [depthInfo, setDepthInfo] = useState<{ depth: number; score: Score } | null>(null);
   const [meter, setMeter] = useState<Score>({ cp: 0 }); // White's point of view
@@ -118,6 +146,15 @@ export default function ChessPage() {
   const moveList = useRef<HTMLOListElement>(null);
   // Bumped whenever the game is reset or rewound, so a late engine reply is ignored.
   const gameId = useRef(0);
+
+  useEffect(() => {
+    try {
+      const state: SavedGame = { level, side: playerSide, orientation, moves };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    } catch {
+      /* private mode or storage full: the game just won't survive a refresh */
+    }
+  }, [level, playerSide, orientation, moves]);
 
   const game = useMemo(() => replay(moves), [moves]);
   const fen = game.fen();
