@@ -1,11 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { WorkerIn, WorkerOut } from './engine.worker';
 
+export type Score = { cp: number } | { mate: number };
+
 export interface SearchInfo {
   depth: number;
-  /** centipawns from the engine's point of view, or mate distance */
-  score: { cp: number } | { mate: number };
+  /** 1 = best line, 2 = second best, ... (only >1 with the MultiPV option) */
+  multipv: number;
+  /** first move of the line, in UCI notation */
+  move: string | null;
+  /** from the side to move's point of view */
+  score: Score;
 }
+
+const FULL_STRENGTH = 21;
 
 export type EngineStatus = 'loading' | 'ready' | 'error';
 
@@ -20,7 +28,14 @@ function parseInfo(line: string): SearchInfo | null {
   const cp = /\bscore cp (-?\d+)/.exec(line);
   const mate = /\bscore mate (-?\d+)/.exec(line);
   if (!depth || !(cp || mate)) return null;
-  return { depth: Number(depth[1]), score: cp ? { cp: Number(cp[1]) } : { mate: Number(mate![1]) } };
+  const multipv = /\bmultipv (\d+)/.exec(line);
+  const pv = /\bpv ([a-h][1-8][a-h][1-8][qrbn]?)/.exec(line);
+  return {
+    depth: Number(depth[1]),
+    multipv: multipv ? Number(multipv[1]) : 1,
+    move: pv ? pv[1] : null,
+    score: cp ? { cp: Number(cp[1]) } : { mate: Number(mate![1]) },
+  };
 }
 
 /** Loads Patricia into a Web Worker and exposes a promise-based "pick a move". */
@@ -89,5 +104,22 @@ export function usePatricia() {
     [send],
   );
 
-  return { status, error, newGame, bestMove };
+  /**
+   * Full-strength analysis of a position: the top two lines for `moveTimeMs`.
+   * Queued behind any search already running, like every other request.
+   */
+  const analyze = useCallback(
+    (fen: string, moves: string[], moveTimeMs: number, onInfo: (i: SearchInfo) => void) =>
+      new Promise<void>((resolve, reject) => {
+        pending.current.push({ resolve: () => resolve(), reject, onInfo });
+        send(`setoption name Skill_Level value ${FULL_STRENGTH}`);
+        send('setoption name MultiPV value 2');
+        send(`position fen ${fen}${moves.length ? ` moves ${moves.join(' ')}` : ''}`);
+        send(`go movetime ${moveTimeMs}`);
+        send('setoption name MultiPV value 1');
+      }),
+    [send],
+  );
+
+  return { status, error, newGame, bestMove, analyze };
 }
