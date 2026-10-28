@@ -202,7 +202,10 @@ export default function ChessPage() {
   }, [fen, engineReady, gameOver, myTurn, wantAnalysis]);
 
   useEffect(() => {
-    moveList.current?.lastElementChild?.scrollIntoView({ block: 'nearest' });
+    // Scroll the list box itself. scrollIntoView would also scroll the whole
+    // page, which on a phone (list below the fold) made it jump on every move.
+    const list = moveList.current;
+    if (list) list.scrollTop = list.scrollHeight;
   }, [moves.length]);
 
   const resetGame = useCallback(
