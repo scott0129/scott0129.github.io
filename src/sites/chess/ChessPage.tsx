@@ -22,6 +22,11 @@ const MIN_THINK_MS = 700; // so low levels don't answer instantly
 const ANALYSIS_MS = 900; // full-strength look at the position while it's your move
 const BEST_COLOR = 'rgba(38, 139, 210, 0.85)'; // solarized blue
 const SECOND_COLOR = 'rgba(203, 117, 22, 0.85)'; // solarized orange
+// Blunder hint thresholds, as a drop in your winning chances (percentage points),
+// matching the cut-offs lichess uses for "mistake" and "blunder".
+const MISTAKE_DROP = 10;
+const BLUNDER_DROP = 15;
+const MIN_JUDGE_DEPTH = 8; // don't judge a move from a shallow look
 
 const levelLabel = (level: number) =>
   level === FULL_STRENGTH ? 'Full strength (~3500 Elo)' : `Level ${level} (~${LEVEL_ELO[level - 1]} Elo)`;
@@ -47,6 +52,14 @@ function whiteShare(score: Score): number {
   const winProbability = 1 / (1 + Math.exp(-score.cp / 400));
   return Math.min(97, Math.max(3, winProbability * 100));
 }
+
+/** Winning chances for White in percent (lichess's centipawn curve). */
+function winPercent(score: Score): number {
+  if ('mate' in score) return score.mate > 0 ? 100 : 0;
+  return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * score.cp)) - 1);
+}
+
+const negate = (s: Score): Score => ('mate' in s ? { mate: -s.mate } : { cp: -s.cp });
 
 function toSan(fen: string, uci: string): string {
   try {
@@ -75,6 +88,20 @@ function usePersistedFlag(key: string, initial: boolean): [boolean, (v: boolean)
     }
   };
   return [value, set];
+}
+
+interface BlunderAlert {
+  kind: 'Blunder' | 'Mistake';
+  played: string; // SAN of your move
+  better: string | null; // SAN of Patricia's preferred move
+  from: string; // eval before your move, your point of view
+  to: string; // eval after it
+}
+
+interface MoveToJudge {
+  fenBefore: string;
+  side: Side;
+  san: string;
 }
 
 interface AnalysisLine {
@@ -138,6 +165,8 @@ export default function ChessPage() {
   const [lines, setLines] = useState<Record<number, AnalysisLine>>({});
   const [showEval, setShowEval] = usePersistedFlag('chess.showEval', false);
   const [showBest, setShowBest] = usePersistedFlag('chess.showBest', false);
+  const [showBlunder, setShowBlunder] = usePersistedFlag('chess.showBlunder', false);
+  const [blunder, setBlunder] = useState<BlunderAlert | null>(null);
   const [selected, setSelected] = useState<Square | null>(null);
   const [promotion, setPromotion] = useState<{ from: Square; to: Square } | null>(null);
   const [boardWidth, setBoardWidth] = useState(480);
@@ -146,6 +175,10 @@ export default function ChessPage() {
   const moveList = useRef<HTMLOListElement>(null);
   // Bumped whenever the game is reset or rewound, so a late engine reply is ignored.
   const gameId = useRef(0);
+  // Latest full-strength look at a position where it was your move, and the move you
+  // just played from it. Patricia's reply search then tells us what that move cost.
+  const analysisRef = useRef<{ fen: string; score: Score; depth: number; move: string } | null>(null);
+  const judgeRef = useRef<MoveToJudge | null>(null);
 
   useEffect(() => {
     try {
@@ -183,6 +216,7 @@ export default function ChessPage() {
     const id = gameId.current;
     const side = game.turn();
     let cancelled = false;
+    let lastScore: Score | null = null; // White's point of view
     setThinking(true);
     setDepthInfo(null);
     (async () => {
@@ -191,11 +225,31 @@ export default function ChessPage() {
           engine.bestMove(START_FEN, moves.map(toUci), level, moveTimeFor(level), (i) => {
             if (cancelled || id !== gameId.current || i.multipv !== 1) return;
             setDepthInfo({ depth: i.depth, score: i.score });
-            setMeter(toWhite(i.score, side));
+            lastScore = toWhite(i.score, side);
+            setMeter(lastScore);
           }),
           sleep(MIN_THINK_MS),
         ]);
         if (cancelled || id !== gameId.current) return;
+
+        const judge = judgeRef.current;
+        judgeRef.current = null;
+        const before = analysisRef.current;
+        if (judge && lastScore && before && before.fen === judge.fenBefore && before.depth >= MIN_JUDGE_DEPTH) {
+          const mine = (s: Score) => (judge.side === 'w' ? winPercent(s) : 100 - winPercent(s));
+          const drop = mine(before.score) - mine(lastScore);
+          if (drop >= MISTAKE_DROP) {
+            const pov = (s: Score) => formatScore(judge.side === 'w' ? s : negate(s));
+            const better = toSan(judge.fenBefore, before.move);
+            setBlunder({
+              kind: drop >= BLUNDER_DROP ? 'Blunder' : 'Mistake',
+              played: judge.san,
+              better: better === judge.san ? null : better,
+              from: pov(before.score),
+              to: pov(lastScore),
+            });
+          }
+        }
         if (uci.length >= 4 && uci !== '0000' && uci !== '(none)') {
           const reply: PlayedMove = {
             from: uci.slice(0, 2) as Square,
@@ -217,17 +271,21 @@ export default function ChessPage() {
   }, [moves, engineReady, playerSide]);
 
   // While it's your move, look at the position at full strength (top two lines)
-  // for the eval bar and best-move arrows. Only runs if one of them is on.
-  const wantAnalysis = showEval || showBest;
+  // for the eval bar, best-move arrows and blunder hint. Only runs if one is on.
+  const wantAnalysis = showEval || showBest || showBlunder;
   useEffect(() => {
     if (!engineReady || gameOver || !myTurn || !wantAnalysis) return;
     const side = game.turn();
+    const analysisFen = fen;
     let cancelled = false;
     setLines({});
     engine
       .analyze(START_FEN, moves.map(toUci), ANALYSIS_MS, (i) => {
-        if (cancelled || !i.move) return;
+        if (!i.move) return;
         const score = toWhite(i.score, side);
+        // Keep updating even after you've moved: the search finishes before Patricia replies.
+        if (i.multipv === 1) analysisRef.current = { fen: analysisFen, score, depth: i.depth, move: i.move };
+        if (cancelled) return;
         setLines((prev) => ({ ...prev, [i.multipv]: { move: i.move!, score, depth: i.depth } }));
         if (i.multipv === 1) setMeter(score);
       })
@@ -256,6 +314,8 @@ export default function ChessPage() {
       setOrientation(side === 'w' ? 'white' : 'black');
       setMoves([]);
       setLines({});
+      setBlunder(null);
+      judgeRef.current = null;
       setMeter({ cp: 0 });
       engine.newGame(level);
     },
@@ -274,6 +334,8 @@ export default function ChessPage() {
     setThinking(false);
     setSelected(null);
     setPromotion(null);
+    setBlunder(null);
+    judgeRef.current = null;
     // Take back to the player's own turn: Patricia's reply and the player's move.
     const lastWasPlayers = (moves.length % 2 === 1) === (playerSide === 'w');
     const drop = lastWasPlayers ? 1 : Math.min(2, moves.length);
@@ -295,6 +357,8 @@ export default function ChessPage() {
     }
     setSelected(null);
     setPromotion(null);
+    setBlunder(null);
+    judgeRef.current = showBlunder ? { fenBefore: fen, side: playerSide, san: candidates[0].san } : null;
     setMoves((prev) => [...prev, { from, to, promotion: promo }]);
     return true;
   };
@@ -415,6 +479,14 @@ export default function ChessPage() {
                   customBoardStyle={{ borderRadius: 4, boxShadow: '0 4px 14px rgba(0,0,0,0.25)' }}
                   animationDuration={180}
                 />
+                {blunder && (
+                  <div className={`pc-alert ${blunder.kind.toLowerCase()}`} role="alert">
+                    <button className="pc-alert-close" onClick={() => setBlunder(null)} aria-label="Dismiss">×</button>
+                    <b>{blunder.kind === 'Blunder' ? '⚠ Blunder!' : '⚠ Mistake'}</b> {blunder.played} took your eval
+                    from {blunder.from} to {blunder.to}.
+                    {blunder.better && <> Better: {blunder.better}.</>}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -460,6 +532,10 @@ export default function ChessPage() {
                 <label className="paper-check">
                   <input type="checkbox" checked={showBest} onChange={(e) => setShowBest(e.target.checked)} />
                   <span>Best moves (top 2)</span>
+                </label>
+                <label className="paper-check">
+                  <input type="checkbox" checked={showBlunder} onChange={(e) => { setShowBlunder(e.target.checked); if (!e.target.checked) setBlunder(null); }} />
+                  <span>Blunder hint</span>
                 </label>
                 {showBest && (
                   <ul className="pc-best">
