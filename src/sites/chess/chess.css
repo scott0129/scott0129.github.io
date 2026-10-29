@@ -25,6 +25,7 @@
 .pc-board {
   flex: 1 1 auto;
   min-width: 0;
+  position: relative;
 }
 
 .pc-panel {
@@ -177,4 +178,42 @@
 
 .pc-best li::before {
   content: none;
+}
+
+.pc-alert {
+  /* floats over the top of the board so it's visible on phones, where the
+     side panel is below the fold */
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 5;
+  padding: 8px 34px 8px 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  border: 2px solid #cb4b16;
+  border-radius: 6px;
+  background: #fbe3d3;
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+.pc-alert.mistake {
+  border-color: #b58900;
+  background: #f6ecc8;
+}
+
+.pc-alert-close {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
 }
