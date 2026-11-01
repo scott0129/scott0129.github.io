@@ -59,7 +59,6 @@ function winPercent(score: Score): number {
   return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * score.cp)) - 1);
 }
 
-const negate = (s: Score): Score => ('mate' in s ? { mate: -s.mate } : { cp: -s.cp });
 
 function toSan(fen: string, uci: string): string {
   try {
@@ -90,13 +89,7 @@ function usePersistedFlag(key: string, initial: boolean): [boolean, (v: boolean)
   return [value, set];
 }
 
-interface BlunderAlert {
-  kind: 'Blunder' | 'Mistake';
-  played: string; // SAN of your move
-  better: string | null; // SAN of Patricia's preferred move
-  from: string; // eval before your move, your point of view
-  to: string; // eval after it
-}
+type BlunderKind = 'Blunder' | 'Mistake';
 
 interface MoveToJudge {
   fenBefore: string;
@@ -166,7 +159,7 @@ export default function ChessPage() {
   const [showEval, setShowEval] = usePersistedFlag('chess.showEval', false);
   const [showBest, setShowBest] = usePersistedFlag('chess.showBest', false);
   const [showBlunder, setShowBlunder] = usePersistedFlag('chess.showBlunder', false);
-  const [blunder, setBlunder] = useState<BlunderAlert | null>(null);
+  const [blunder, setBlunder] = useState<BlunderKind | null>(null);
   const [selected, setSelected] = useState<Square | null>(null);
   const [promotion, setPromotion] = useState<{ from: Square; to: Square } | null>(null);
   const [boardWidth, setBoardWidth] = useState(480);
@@ -239,15 +232,7 @@ export default function ChessPage() {
           const mine = (s: Score) => (judge.side === 'w' ? winPercent(s) : 100 - winPercent(s));
           const drop = mine(before.score) - mine(lastScore);
           if (drop >= MISTAKE_DROP) {
-            const pov = (s: Score) => formatScore(judge.side === 'w' ? s : negate(s));
-            const better = toSan(judge.fenBefore, before.move);
-            setBlunder({
-              kind: drop >= BLUNDER_DROP ? 'Blunder' : 'Mistake',
-              played: judge.san,
-              better: better === judge.san ? null : better,
-              from: pov(before.score),
-              to: pov(lastScore),
-            });
+            setBlunder(drop >= BLUNDER_DROP ? 'Blunder' : 'Mistake');
           }
         }
         if (uci.length >= 4 && uci !== '0000' && uci !== '(none)') {
@@ -480,11 +465,8 @@ export default function ChessPage() {
                   animationDuration={180}
                 />
                 {blunder && (
-                  <div className={`pc-alert ${blunder.kind.toLowerCase()}`} role="alert">
-                    <button className="pc-alert-close" onClick={() => setBlunder(null)} aria-label="Dismiss">×</button>
-                    <b>{blunder.kind === 'Blunder' ? '⚠ Blunder!' : '⚠ Mistake'}</b> {blunder.played} took your eval
-                    from {blunder.from} to {blunder.to}.
-                    {blunder.better && <> Better: {blunder.better}.</>}
+                  <div className={`pc-flag ${blunder.toLowerCase()}`} role="alert" title={blunder}>
+                    {blunder === 'Blunder' ? '??' : '?'}
                   </div>
                 )}
               </div>
