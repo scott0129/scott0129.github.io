@@ -1,0 +1,25 @@
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap:.5em;
+}
+
+.label-input-container {
+  display: flex;
+  justify-content: end;
+  gap: 1em;
+  align-items: center;
+  min-width: 20em;
+}
+
+.label {
+  text-align: right;
+  flex: 1;
+}
+
+.input {
+  flex: 2;
+  margin-left: 20px; /* Adjust spacing between label and input as needed */
+}
