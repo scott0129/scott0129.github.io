@@ -271,7 +271,22 @@ export default function ChessPage() {
         // Keep updating even after you've moved: the search finishes before Patricia replies.
         if (i.multipv === 1) analysisRef.current = { fen: analysisFen, score, depth: i.depth, move: i.move };
         if (cancelled) return;
-        setLines((prev) => ({ ...prev, [i.multipv]: { move: i.move!, score, depth: i.depth } }));
+        // The two lines can swap rank between depths, so the other slot may still hold
+        // this move from an earlier depth. Swap them rather than showing it twice: two
+        // identical arrows share a React key inside the board and leave a ghost arrow
+        // behind that never goes away.
+        setLines((prev) => {
+          const next = { ...prev };
+          const fresh: AnalysisLine = { move: i.move!, score, depth: i.depth };
+          for (const [rank, line] of Object.entries(prev)) {
+            const r = Number(rank);
+            if (r === i.multipv || line.move !== i.move) continue;
+            if (prev[i.multipv] && prev[i.multipv].move !== i.move) next[r] = prev[i.multipv];
+            else delete next[r];
+          }
+          next[i.multipv] = fresh;
+          return next;
+        });
         if (i.multipv === 1) setMeter(score);
       })
       .catch(() => {});
@@ -404,7 +419,7 @@ export default function ChessPage() {
     const out: [Square, Square, string][] = [];
     for (const [rank, color] of [[1, BEST_COLOR], [2, SECOND_COLOR]] as const) {
       const move = lines[rank]?.move;
-      if (move) out.push([move.slice(0, 2) as Square, move.slice(2, 4) as Square, color]);
+      if (move && !out.some((a) => a[0] === move.slice(0, 2) && a[1] === move.slice(2, 4))) out.push([move.slice(0, 2) as Square, move.slice(2, 4) as Square, color]);
     }
     return out;
   }, [showBest, showAnalysis, lines]);
